@@ -3,7 +3,10 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
 } from '@nestjs/common';
@@ -22,8 +25,12 @@ export class ArtistController {
     return this.artistService.findAll();
   }
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return this.artistService.findOne(id);
+  async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
+    const item = this.artistService.findOne(id);
+    if (!item) {
+      throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+    }
+    return item;
   }
 
   @Post()

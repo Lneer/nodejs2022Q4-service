@@ -5,13 +5,14 @@ export abstract class DBEntity<
 > {
   protected entities: Entity[] = [];
   abstract create(createDTO: CreateDTO): Entity;
+  abstract change(id: string, chandeDTO: ChangeDTO): Entity;
   findAll() {
     return this.entities;
   }
 
   findOne(id: string) {
     const findedEntity = this.entities.find((entity) => entity.id === id);
-    return findedEntity === undefined ? null : findedEntity;
+    return findedEntity;
   }
 
   delete(id: string) {
@@ -21,11 +22,11 @@ export abstract class DBEntity<
     return deletedEntity;
   }
 
-  change(id: string, chandeDTO: ChangeDTO) {
-    const idx = this.entities.findIndex((entity) => entity.id === id);
-    if (idx < 0) return null;
-    const changedEntity = { ...this.entities[idx], ...chandeDTO };
-    this.entities[idx] = changedEntity;
-    return changedEntity;
-  }
+  // change(id: string, chandeDTO: ChangeDTO) {
+  //   const idx = this.entities.findIndex((entity) => entity.id === id);
+  //   if (idx < 0) return null;
+  //   const changedEntity = { ...this.entities[idx], ...chandeDTO };
+  //   this.entities[idx] = changedEntity;
+  //   return changedEntity;
+  // }
 }

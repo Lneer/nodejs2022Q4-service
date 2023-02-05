@@ -36,4 +36,7 @@ export class ArtistService extends DBEntity<
     this.entities.push(created);
     return created;
   }
+  change(id: string, chandeDTO: ChangeArtistDTO): ArtistEntity {
+    return this.entities[0];
+  }
 }

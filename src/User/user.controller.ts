@@ -3,23 +3,32 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
-  Patch,
+  ParseUUIDPipe,
+  Put,
   Post,
 } from '@nestjs/common';
 import { UserService, ChangeUserDTO, CreateUserDTO } from './user.service';
-import { UsePipes } from '@nestjs/common/decorators';
+import { HttpCode, UsePipes } from '@nestjs/common/decorators';
+import { ErrorsCode } from 'src/utils/common types/enum';
 
-@Controller('artist')
+@Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
   @Get()
   async findAll() {
     return this.userService.findAll();
   }
+
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return this.userService.findOne(id);
+  async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
+    const item = this.userService.findOne(id);
+    if (!item) {
+      throw new HttpException('User not Found', HttpStatus.NOT_FOUND);
+    }
+    return item;
   }
 
   @Post()
@@ -29,12 +38,29 @@ export class UserController {
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string) {
-    return this.userService.delete(id);
+  @HttpCode(204)
+  async delete(@Param('id', new ParseUUIDPipe()) id: string) {
+    const item = this.userService.delete(id);
+    if (!item) {
+      throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+    }
+    return item;
   }
 
-  @Patch(':id')
-  async change(@Param('id') id: string, @Body() changeUserDto: ChangeUserDTO) {
-    return this.userService.change(id, changeUserDto);
+  @Put(':id')
+  async change(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() changeUserDto: ChangeUserDTO,
+  ) {
+    try {
+      return this.userService.change(id, changeUserDto);
+    } catch (error) {
+      if (error.message === ErrorsCode[404]) {
+        throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+      }
+      if (error.message === ErrorsCode[403]) {
+        throw new HttpException('incorrect password', HttpStatus.FORBIDDEN);
+      }
+    }
   }
 }

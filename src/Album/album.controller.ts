@@ -3,11 +3,16 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpException,
+  HttpStatus,
   Param,
-  Patch,
+  ParseUUIDPipe,
+  Put,
   Post,
 } from '@nestjs/common';
 import { AlbumService, ChangeAlbumDTO, CreateAlbumDTO } from './album.service';
+import { ErrorsCode } from 'src/utils/common types/enum';
 
 @Controller('album')
 export class AlbumController {
@@ -16,9 +21,14 @@ export class AlbumController {
   async findAll() {
     return this.albumService.findAll();
   }
+
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return this.albumService.findOne(id);
+  async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
+    const item = this.albumService.findOne(id);
+    if (!item) {
+      throw new HttpException('Album not Found', HttpStatus.NOT_FOUND);
+    }
+    return item;
   }
 
   @Post()
@@ -27,15 +37,29 @@ export class AlbumController {
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string) {
-    return this.albumService.delete(id);
+  @HttpCode(204)
+  async delete(@Param('id', new ParseUUIDPipe()) id: string) {
+    const item = this.albumService.delete(id);
+    if (!item) {
+      throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+    }
+    return item;
   }
 
-  @Patch(':id')
+  @Put(':id')
   async change(
     @Param('id') id: string,
     @Body() changeAlbumDto: ChangeAlbumDTO,
   ) {
-    return this.albumService.change(id, changeAlbumDto);
+    try {
+      return this.albumService.change(id, changeAlbumDto);
+    } catch (error) {
+      if (error.message === ErrorsCode[404]) {
+        throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+      }
+      if (error.message === ErrorsCode[403]) {
+        throw new HttpException('incorrect password', HttpStatus.FORBIDDEN);
+      }
+    }
   }
 }
