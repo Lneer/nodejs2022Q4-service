@@ -9,7 +9,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { FavoriteEntity, FavoriteService } from './favorite.service';
-import { HttpCode, UsePipes } from '@nestjs/common/decorators';
+import { HttpCode } from '@nestjs/common/decorators';
 
 @Controller('favs')
 export class FavoriteController {
@@ -20,7 +20,6 @@ export class FavoriteController {
   }
 
   @Post(':type/:id')
-  @UsePipes()
   async create(
     @Param('type') type: string,
     @Param('id', new ParseUUIDPipe()) id: string,
@@ -35,6 +34,7 @@ export class FavoriteController {
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
+    return item;
   }
 
   @Delete(':type/:id')
@@ -50,5 +50,6 @@ export class FavoriteController {
     if (!item) {
       throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
     }
+    return item;
   }
 }

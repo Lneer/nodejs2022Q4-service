@@ -61,8 +61,7 @@ export class ArtistService extends DBEntity<
     const album = this.albumService.findAll();
     album.forEach((artist) => {
       if (artist.artistId === id) {
-        const artistId = null;
-        this.albumService.change(artist.id, { ...artist, artistId });
+        this.albumService.change(artist.id, { ...artist, artistId: null });
       }
     });
     const tracks = this.trackService.findAll();

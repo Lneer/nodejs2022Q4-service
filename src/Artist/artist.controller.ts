@@ -47,6 +47,7 @@ export class ArtistController {
     if (!item) {
       throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
     }
+    return item;
   }
 
   @Put(':id')

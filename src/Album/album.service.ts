@@ -70,8 +70,7 @@ export class AlbumService extends DBEntity<
     const track = this.trackService.findAll();
     track.forEach((album) => {
       if (album.albumId === id) {
-        const albumId = null;
-        this.trackService.change(album.id, { ...album, albumId });
+        this.trackService.change(album.id, { ...album, albumId: null });
       }
     });
     return deletedAlbum;

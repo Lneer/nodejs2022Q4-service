@@ -30,13 +30,11 @@ export class FavoriteService {
 
   createFavorite(type: keyof FavoriteEntity, id: string) {
     let item: any;
-    console.log(type);
 
     if (type === 'albums') {
       item = this.albumService.findOne({ key: 'id', equal: id });
     }
     if (type === 'artists') {
-      console.log('inside');
       item = this.artistService.findOne({ key: 'id', equal: id });
     }
     if (type === 'tracks') {
@@ -50,18 +48,18 @@ export class FavoriteService {
   }
 
   deleteFavorite(type: keyof FavoriteEntity, id: string) {
-    let item: any;
-    if (type === 'albums') {
-      item = this.albumService.findOne({ key: 'id', equal: id });
-    }
-    if (type === 'artists') {
-      item = this.artistService.findOne({ key: 'id', equal: id });
-    }
-    if (type === 'tracks') {
-      item = this.trackService.findOne({ key: 'id', equal: id });
-    }
+    // let item: any;
+    // if (type === 'albums') {
+    //   item = this.albumService.findOne({ key: 'id', equal: id });
+    // }
+    // if (type === 'artists') {
+    //   item = this.artistService.findOne({ key: 'id', equal: id });
+    // }
+    // if (type === 'tracks') {
+    //   item = this.trackService.findOne({ key: 'id', equal: id });
+    // }
 
-    if (!item) return null;
+    // if (!item) return null;
 
     const idx = this.favoriteDB[type].findIndex((el) => el.id === id);
     if (idx < 0) return null;
