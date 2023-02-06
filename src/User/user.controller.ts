@@ -34,7 +34,9 @@ export class UserController {
   @Post()
   @UsePipes()
   async create(@Body() createUserDto: CreateUserDTO) {
-    return this.userService.create(createUserDto);
+    const createdUser = { ...this.userService.create(createUserDto) };
+    delete createdUser.password;
+    return createdUser;
   }
 
   @Delete(':id')
@@ -53,7 +55,9 @@ export class UserController {
     @Body() changeUserDto: ChangeUserDTO,
   ) {
     try {
-      return this.userService.change(id, changeUserDto);
+      const changedUser = { ...this.userService.change(id, changeUserDto) };
+      delete changedUser.password;
+      return changedUser;
     } catch (error) {
       if (error.message === ErrorsCode[404]) {
         throw new HttpException('Not Found', HttpStatus.NOT_FOUND);

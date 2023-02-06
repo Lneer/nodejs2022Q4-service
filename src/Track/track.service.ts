@@ -22,11 +22,11 @@ export class TrackEntity {
   name: string;
 
   @ValidateIf((value) => value !== null)
-  @IsUUID('4')
+  // @IsUUID('4')
   artistId: string | null;
 
   @ValidateIf((value) => value !== null)
-  @IsUUID('4')
+  // @IsUUID('4')
   albumId: string | null;
 
   @IsInt()
@@ -54,20 +54,18 @@ export class TrackService extends DBEntity<
     super();
   }
   create(trackDto: CreateTrackDTO) {
-    const album = this.albumService.findOne({
-      key: 'id',
-      equal: trackDto.albumId,
-    });
-    const artist = this.artistService.findOne({
-      key: 'id',
-      equal: trackDto.artistId,
-    });
-    const albumId = album ? album.id : null;
-    const artistId = artist ? artist.id : null;
+    // const album = this.albumService.findOne({
+    //   key: 'id',
+    //   equal: trackDto.albumId,
+    // });
+    // const artist = this.artistService.findOne({
+    //   key: 'id',
+    //   equal: trackDto.artistId,
+    // });
+    // const albumId = album ? album.id : null;
+    // const artistId = artist ? artist.id : null;
     const created: TrackEntity = {
       ...trackDto,
-      albumId,
-      artistId,
       id: uuid(),
     };
     this.entities.push(created);

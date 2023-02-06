@@ -65,11 +65,11 @@ export class ArtistService extends DBEntity<
         this.albumService.change(artist.id, { ...artist, artistId });
       }
     });
-    const track = this.trackService.findAll();
-    track.forEach((artist) => {
-      if (artist.artistId === id) {
-        const artistId = null;
-        this.trackService.change(artist.id, { ...artist, artistId });
+    const tracks = this.trackService.findAll();
+    tracks.forEach((track) => {
+      if (track.artistId === id) {
+        // const artistId = null;
+        this.trackService.change(track.id, { ...track, artistId: null });
       }
     });
     return deletedArtist;

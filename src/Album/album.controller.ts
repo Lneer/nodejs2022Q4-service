@@ -10,6 +10,7 @@ import {
   ParseUUIDPipe,
   Put,
   Post,
+  UsePipes,
 } from '@nestjs/common';
 import { AlbumService, ChangeAlbumDTO, CreateAlbumDTO } from './album.service';
 import { ErrorsCode } from 'src/utils/common types/enum';
@@ -32,6 +33,7 @@ export class AlbumController {
   }
 
   @Post()
+  @UsePipes()
   async create(@Body() createAlbumDto: CreateAlbumDTO) {
     return this.albumService.create(createAlbumDto);
   }
@@ -48,7 +50,7 @@ export class AlbumController {
 
   @Put(':id')
   async change(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() changeAlbumDto: ChangeAlbumDTO,
   ) {
     try {

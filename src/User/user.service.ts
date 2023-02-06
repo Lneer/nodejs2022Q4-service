@@ -66,7 +66,7 @@ export class UserService extends DBEntity<
     if (chandeDTO.oldPassword !== this.entities[idx].password) {
       throw new Error(ErrorsCode[403]);
     }
-    const version = this.entities[idx].version + 1;
+    const version = this.entities[idx].version++;
     const updatedAt = Date.now();
     const changedEntity = {
       ...this.entities[idx],

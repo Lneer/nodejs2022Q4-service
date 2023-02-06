@@ -15,7 +15,8 @@ import {
   ChangeArtistDTO,
   CreateArtistDTO,
 } from './artist.service';
-import { UsePipes } from '@nestjs/common/decorators';
+import { HttpCode, UsePipes } from '@nestjs/common/decorators';
+import { ErrorsCode } from 'src/utils/common types/enum';
 
 @Controller('artist')
 export class ArtistController {
@@ -40,8 +41,12 @@ export class ArtistController {
   }
 
   @Delete(':id')
+  @HttpCode(204)
   async delete(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.artistService.delete(id);
+    const item = this.artistService.delete(id);
+    if (!item) {
+      throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+    }
   }
 
   @Put(':id')
@@ -49,6 +54,12 @@ export class ArtistController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() changeArtistDto: ChangeArtistDTO,
   ) {
-    return this.artistService.change(id, changeArtistDto);
+    try {
+      return this.artistService.change(id, changeArtistDto);
+    } catch (error) {
+      if (error.message === ErrorsCode[404]) {
+        throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+      }
+    }
   }
 }
