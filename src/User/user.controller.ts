@@ -24,7 +24,7 @@ export class UserController {
 
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
-    const item = this.userService.findOne(id);
+    const item = this.userService.findOne({ key: 'id', equal: id });
     if (!item) {
       throw new HttpException('User not Found', HttpStatus.NOT_FOUND);
     }

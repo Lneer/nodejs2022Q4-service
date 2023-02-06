@@ -24,7 +24,7 @@ export class AlbumController {
 
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
-    const item = this.albumService.findOne(id);
+    const item = this.albumService.findOne({ key: 'id', equal: id });
     if (!item) {
       throw new HttpException('Album not Found', HttpStatus.NOT_FOUND);
     }

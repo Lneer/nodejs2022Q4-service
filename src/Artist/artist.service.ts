@@ -1,8 +1,11 @@
 import { v4 as uuid } from 'uuid';
-import { Injectable } from '@nestjs/common';
+import { Injectable, forwardRef, Inject } from '@nestjs/common';
 import { DBEntity } from '../utils/DB/DBEntyty';
-import { OmitType, PartialType } from '@nestjs/mapped-types';
+import { OmitType } from '@nestjs/mapped-types';
 import { IsNotEmpty, IsUUID, IsString, IsBoolean } from 'class-validator';
+import { ErrorsCode } from '../utils/common types/enum';
+import { TrackService } from 'src/Track/track.service';
+import { AlbumService } from 'src/Album/album.service';
 
 export class ArtistEntity {
   @IsUUID('4')
@@ -18,9 +21,7 @@ export class ArtistEntity {
 }
 
 export class CreateArtistDTO extends OmitType(ArtistEntity, ['id'] as const) {}
-export class ChangeArtistDTO extends PartialType(
-  OmitType(ArtistEntity, ['id'] as const),
-) {}
+export class ChangeArtistDTO extends CreateArtistDTO {}
 
 @Injectable()
 export class ArtistService extends DBEntity<
@@ -28,6 +29,14 @@ export class ArtistService extends DBEntity<
   ChangeArtistDTO,
   CreateArtistDTO
 > {
+  constructor(
+    @Inject(forwardRef(() => AlbumService))
+    private albumService: AlbumService,
+    @Inject(forwardRef(() => TrackService))
+    private trackService: TrackService,
+  ) {
+    super();
+  }
   create(artistDto: CreateArtistDTO) {
     const created: ArtistEntity = {
       ...artistDto,
@@ -37,6 +46,32 @@ export class ArtistService extends DBEntity<
     return created;
   }
   change(id: string, chandeDTO: ChangeArtistDTO): ArtistEntity {
-    return this.entities[0];
+    const idx = this.entities.findIndex((entity) => entity.id === id);
+    if (idx < 0) {
+      throw new Error(ErrorsCode[404]);
+    }
+    const changedArtist = { ...chandeDTO, id };
+    this.entities[idx] = changedArtist;
+    return changedArtist;
+  }
+  delete(id: string): ArtistEntity {
+    const idx = this.entities.findIndex((entity) => entity.id === id);
+    const deletedArtist = this.entities[idx];
+    this.entities.splice(idx, 1);
+    const album = this.albumService.findAll();
+    album.forEach((artist) => {
+      if (artist.artistId === id) {
+        const artistId = null;
+        this.albumService.change(artist.id, { ...artist, artistId });
+      }
+    });
+    const track = this.trackService.findAll();
+    track.forEach((artist) => {
+      if (artist.artistId === id) {
+        const artistId = null;
+        this.trackService.change(artist.id, { ...artist, artistId });
+      }
+    });
+    return deletedArtist;
   }
 }

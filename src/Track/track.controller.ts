@@ -24,7 +24,7 @@ export class TrackController {
 
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
-    const item = this.trackService.findOne(id);
+    const item = this.trackService.findOne({ key: 'id', equal: id });
     if (!item) {
       throw new HttpException('Track not Found', HttpStatus.NOT_FOUND);
     }

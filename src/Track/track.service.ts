@@ -9,8 +9,9 @@ import {
   ValidateIf,
   IsInt,
 } from 'class-validator';
-import { ErrorsCode } from 'src/utils/common types/enum';
-import { AlbumService } from 'src/Album/album.service';
+import { ErrorsCode } from '../utils/common types/enum';
+import { AlbumService } from '../Album/album.service';
+import { ArtistService } from '../Artist/artist.service';
 
 export class TrackEntity {
   @IsUUID('4')
@@ -47,15 +48,26 @@ export class TrackService extends DBEntity<
   constructor(
     @Inject(forwardRef(() => AlbumService))
     private albumService: AlbumService,
+    @Inject(forwardRef(() => ArtistService))
+    private artistService: ArtistService,
   ) {
     super();
   }
   create(trackDto: CreateTrackDTO) {
-    const album = this.albumService.findOne(trackDto.albumId);
+    const album = this.albumService.findOne({
+      key: 'id',
+      equal: trackDto.albumId,
+    });
+    const artist = this.artistService.findOne({
+      key: 'id',
+      equal: trackDto.artistId,
+    });
     const albumId = album ? album.id : null;
+    const artistId = artist ? artist.id : null;
     const created: TrackEntity = {
       ...trackDto,
       albumId,
+      artistId,
       id: uuid(),
     };
     this.entities.push(created);

@@ -59,8 +59,6 @@ export class UserService extends DBEntity<
   }
 
   change(id: string, chandeDTO: ChangeUserDTO): UserEntity {
-    console.debug('id', id);
-    console.debug('chandeDTO', chandeDTO);
     const idx = this.entities.findIndex((entity) => entity.id === id);
     if (idx < 0) {
       throw new Error(ErrorsCode[404]);
