@@ -1,7 +1,7 @@
 FROM node:18.14-alpine3.16
 WORKDIR /app
-COPY package*.json .
+COPY package*.json ./
 RUN npm install
 COPY . .
-EXPOSE 4000
+EXPOSE 8080
 CMD ["npm", "start"]
