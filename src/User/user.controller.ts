@@ -10,9 +10,11 @@ import {
   Put,
   Post,
 } from '@nestjs/common';
-import { UserService, ChangeUserDTO, CreateUserDTO } from './user.service';
+import { UserService } from './user.service';
 import { HttpCode, UsePipes } from '@nestjs/common/decorators';
 import { ErrorsCode } from 'src/utils/common types/enum';
+import { CreateUserDTO } from './dto/createUser.dto';
+import { ChangeUserDTO } from './dto/changeUser.dto';
 
 @Controller('user')
 export class UserController {
@@ -24,7 +26,7 @@ export class UserController {
 
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
-    const item = this.userService.findOne({ key: 'id', equal: id });
+    const item = this.userService.findOne(id);
     if (!item) {
       throw new HttpException('User not Found', HttpStatus.NOT_FOUND);
     }
@@ -34,8 +36,7 @@ export class UserController {
   @Post()
   @UsePipes()
   async create(@Body() createUserDto: CreateUserDTO) {
-    const createdUser = { ...this.userService.create(createUserDto) };
-    delete createdUser.password;
+    const createdUser = this.userService.create(createUserDto);
     return createdUser;
   }
 
@@ -55,8 +56,7 @@ export class UserController {
     @Body() changeUserDto: ChangeUserDTO,
   ) {
     try {
-      const changedUser = { ...this.userService.change(id, changeUserDto) };
-      delete changedUser.password;
+      const changedUser = this.userService.change(id, changeUserDto);
       return changedUser;
     } catch (error) {
       if (error.message === ErrorsCode[404]) {
