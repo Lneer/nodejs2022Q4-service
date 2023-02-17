@@ -7,40 +7,6 @@ import { UserEntity } from './entities/user.entity';
 import { CreateUserDTO } from './dto/createUser.dto';
 import { UserDto } from './dto/user.dto';
 import { ChangeUserDTO } from './dto/changeUser.dto';
-// export class UserEntity {
-//   @IsUUID('4')
-//   id: string;
-
-//   @IsString()
-//   @IsNotEmpty()
-//   login: string;
-
-//   @IsString()
-//   @IsNotEmpty()
-//   password: string;
-
-//   @IsInt()
-//   version: number;
-
-//   createdAt: number;
-//   updatedAt: number;
-// }
-
-// export class CreateUserDTO extends OmitType(UserEntity, [
-//   'id',
-//   'version',
-//   'updatedAt',
-//   'createdAt',
-// ] as const) {}
-
-// export class ChangeUserDTO {
-//   @IsString()
-//   @IsNotEmpty()
-//   oldPassword: string;
-//   @IsString()
-//   @IsNotEmpty()
-//   newPassword: string;
-// }
 
 @Injectable()
 export class UserService {
@@ -50,14 +16,14 @@ export class UserService {
   ) {}
 
   async create(userDto: CreateUserDTO) {
-    const time = Date.now();
+    const timeStamp = Date.now();
 
     const created: UserDto = {
       ...userDto,
       id: uuid(),
       version: 1,
-      createdAt: time,
-      updatedAt: time,
+      createdAt: timeStamp,
+      updatedAt: timeStamp,
     };
     const createdUser = this.userRepository.create(created);
     return (await this.userRepository.save(createdUser)).toResponse();

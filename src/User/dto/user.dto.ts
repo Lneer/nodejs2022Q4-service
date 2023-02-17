@@ -1,4 +1,3 @@
-import { Exclude } from 'class-transformer';
 import { IsInt, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import { UserEntity } from '../entities/user.entity';
 
@@ -12,7 +11,6 @@ export class UserDto extends UserEntity {
 
   @IsString()
   @IsNotEmpty()
-  @Exclude()
   password: string;
 
   @IsInt()

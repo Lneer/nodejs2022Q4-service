@@ -10,13 +10,11 @@ import {
   Put,
   Post,
 } from '@nestjs/common';
-import {
-  ArtistService,
-  ChangeArtistDTO,
-  CreateArtistDTO,
-} from './artist.service';
+import { ArtistService } from './artist.service';
 import { HttpCode, UsePipes } from '@nestjs/common/decorators';
 import { ErrorsCode } from 'src/utils/common types/enum';
+import { CreateArtistDTO } from './dto/createArtist.dto';
+import { ChangeArtistDTO } from './dto/chandeArtist.dto';
 
 @Controller('artist')
 export class ArtistController {
@@ -27,7 +25,7 @@ export class ArtistController {
   }
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
-    const item = this.artistService.findOne({ key: 'id', equal: id });
+    const item = this.artistService.findOne(id);
     if (!item) {
       throw new HttpException('Artist Not Found', HttpStatus.NOT_FOUND);
     }

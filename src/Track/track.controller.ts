@@ -10,9 +10,11 @@ import {
   Put,
   Post,
 } from '@nestjs/common';
-import { TrackService, ChangeTrackDTO, CreateTrackDTO } from './track.service';
+import { TrackService } from './track.service';
 import { HttpCode, UsePipes } from '@nestjs/common/decorators';
 import { ErrorsCode } from 'src/utils/common types/enum';
+import { CreateTrackDTO } from './dto/createTrack.dto';
+import { ChangeTrackDTO } from './dto/chandeTrack.dto';
 
 @Controller('track')
 export class TrackController {
@@ -24,7 +26,7 @@ export class TrackController {
 
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
-    const item = this.trackService.findOne({ key: 'id', equal: id });
+    const item = this.trackService.findOne(id);
     if (!item) {
       throw new HttpException('Track not Found', HttpStatus.NOT_FOUND);
     }

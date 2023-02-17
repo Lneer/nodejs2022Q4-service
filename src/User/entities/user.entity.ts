@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('user')
+@Entity('users')
 export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -22,6 +22,7 @@ export class UserEntity {
 
   toResponse() {
     const { id, login, version, createdAt, updatedAt } = this;
+    // const { id, login, version } = this;
     return { id, login, version, createdAt, updatedAt };
   }
 }

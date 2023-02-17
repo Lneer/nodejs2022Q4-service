@@ -12,8 +12,10 @@ import {
   Post,
   UsePipes,
 } from '@nestjs/common';
-import { AlbumService, ChangeAlbumDTO, CreateAlbumDTO } from './album.service';
+import { AlbumService } from './album.service';
 import { ErrorsCode } from 'src/utils/common types/enum';
+import { CreateAlbumDTO } from './dto/createAlbum.dto';
+import { ChangeAlbumDTO } from './dto/changeAlbum.dto';
 
 @Controller('album')
 export class AlbumController {
@@ -25,7 +27,7 @@ export class AlbumController {
 
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
-    const item = this.albumService.findOne({ key: 'id', equal: id });
+    const item = this.albumService.findOne(id);
     if (!item) {
       throw new HttpException('Album not Found', HttpStatus.NOT_FOUND);
     }

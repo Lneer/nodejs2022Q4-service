@@ -12,72 +12,61 @@ import {
 import { ErrorsCode } from '../utils/common types/enum';
 import { AlbumService } from '../Album/album.service';
 import { ArtistService } from '../Artist/artist.service';
-
-export class TrackEntity {
-  @IsUUID('4')
-  id: string;
-
-  @IsString()
-  @IsNotEmpty()
-  name: string;
-
-  @ValidateIf((value) => value !== null)
-  // @IsUUID('4')
-  artistId: string | null;
-
-  @ValidateIf((value) => value !== null)
-  // @IsUUID('4')
-  albumId: string | null;
-
-  @IsInt()
-  @IsNotEmpty()
-  duration: number;
-}
-
-export class CreateTrackDTO extends OmitType(TrackEntity, ['id'] as const) {}
-export class ChangeTrackDTO extends PartialType(
-  OmitType(TrackEntity, ['id'] as const),
-) {}
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { TrackEntity } from './entities/track.entity';
+import { CreateTrackDTO } from './dto/createTrack.dto';
+import { ChangeTrackDTO } from './dto/chandeTrack.dto';
 
 @Injectable()
-export class TrackService extends DBEntity<
-  TrackEntity,
-  ChangeTrackDTO,
-  CreateTrackDTO
-> {
+export class TrackService {
   constructor(
-    @Inject(forwardRef(() => AlbumService))
-    private albumService: AlbumService,
-    @Inject(forwardRef(() => ArtistService))
-    private artistService: ArtistService,
-  ) {
-    super();
-  }
-  create(trackDto: CreateTrackDTO) {
-    // const album = this.albumService.findOne({
-    //   key: 'id',
-    //   equal: trackDto.albumId,
-    // });
-    // const artist = this.artistService.findOne({
-    //   key: 'id',
-    //   equal: trackDto.artistId,
-    // });
-    // const albumId = album ? album.id : null;
-    // const artistId = artist ? artist.id : null;
+    @InjectRepository(TrackEntity)
+    private trackRepository: Repository<TrackEntity>,
+  ) {}
+  async create(trackDto: CreateTrackDTO) {
     const created: TrackEntity = {
       ...trackDto,
       id: uuid(),
     };
-    this.entities.push(created);
-    return created;
+    const createdTrack = this.trackRepository.create(created);
+    return await this.trackRepository.save(createdTrack);
   }
-  change(id: string, chandeDTO: ChangeTrackDTO) {
-    const idx = this.entities.findIndex((entity) => entity.id === id);
-    if (idx < 0) {
+
+  async findAll() {
+    const tracks = await this.trackRepository.find();
+
+    return tracks;
+  }
+
+  async findOne(trackId: string) {
+    const track = await this.trackRepository.findOne({
+      where: { id: trackId },
+    });
+
+    if (track) return track;
+    throw new Error(ErrorsCode[404]);
+  }
+
+  async change(trackId: string, chandeDTO: ChangeTrackDTO) {
+    const trackForUpdate = await this.trackRepository.findOne({
+      where: { id: trackId },
+    });
+
+    if (!trackForUpdate) {
       throw new Error(ErrorsCode[404]);
     }
-    const changedEntity = { ...this.entities[idx], ...chandeDTO };
-    this.entities[idx] = changedEntity;
-    return changedEntity;
+
+    const changedEntity = { ...trackForUpdate, ...chandeDTO };
+    const changedTrack = await this.trackRepository.save(changedEntity);
+    return changedTrack;
+  }
+
+  async delete(trackId: string) {
+    const deletedTrack = await this.trackRepository.delete(trackId);
+
+    if (deletedTrack.affected === 0) {
+      throw new Error(ErrorsCode[404]);
+    }
   }
 }
