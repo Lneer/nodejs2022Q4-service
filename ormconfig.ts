@@ -11,6 +11,8 @@ export default {
   username: process.env.POSTGRES_USER as string,
   password: process.env.POSTGRES_PASSWORD as string,
   database: process.env.POSTGRES_DATABASE as string,
-  synchronize: false,
+  synchronize: true,
   entities: [UserEntity],
+  autoLoadEntities: true,
+  autoLoadModels: true,
 } as DataSourceOptions;
