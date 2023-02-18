@@ -1,4 +1,10 @@
-import { IsInt, IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 import { ArtistEntity } from 'src/Artist/entities/artist.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -19,8 +25,9 @@ export class AlbumEntity {
   year!: number;
 
   @Column({ nullable: true })
+  @IsOptional()
   @IsUUID('4')
-  artistId?: string;
+  artistId: string;
 
   @ManyToOne(() => ArtistEntity, { onDelete: 'SET NULL' })
   artist: ArtistEntity;

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ErrorsCode } from 'src/utils/common types/enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -14,12 +14,12 @@ export class AlbumService {
   ) {}
 
   async create(albumDto: CreateAlbumDTO) {
-    return this.albumRepository.save(albumDto);
+    const createdAlbum = this.albumRepository.create(albumDto);
+    return this.albumRepository.save(createdAlbum);
   }
 
   async findAll() {
     const albums = await this.albumRepository.find();
-
     return albums;
   }
 
@@ -28,9 +28,8 @@ export class AlbumService {
       where: { id: albumId },
     });
 
-    if (album) return album;
-
-    throw new Error(ErrorsCode[404]);
+    if (!album) throw new NotFoundException(ErrorsCode[404]);
+    return album;
   }
 
   async change(albumId: string, chandeDTO: ChangeAlbumDTO) {
@@ -39,18 +38,22 @@ export class AlbumService {
     });
 
     if (!albumForUpdate) {
-      throw new Error(ErrorsCode[404]);
+      throw new NotFoundException(ErrorsCode[404]);
     }
 
-    const changedEntity = { ...chandeDTO, albumId };
+    const changedEntity = { ...albumForUpdate, ...chandeDTO };
     return await this.albumRepository.save(changedEntity);
   }
 
   async delete(albumId: string) {
-    const deletedAlbum = await this.albumRepository.delete(albumId);
-    if (deletedAlbum.affected === 0) {
-      throw new Error(ErrorsCode[404]);
+    const albumFordelete = await this.albumRepository.findOne({
+      where: { id: albumId },
+    });
+
+    if (!albumFordelete) {
+      throw new NotFoundException(ErrorsCode[404]);
     }
-    return deletedAlbum;
+
+    await this.albumRepository.delete(albumId);
   }
 }

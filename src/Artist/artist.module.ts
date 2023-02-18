@@ -6,9 +6,9 @@ import { ArtistEntity } from './entities/artist.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
+  imports: [TypeOrmModule.forFeature([ArtistEntity])],
   controllers: [ArtistController],
   providers: [ArtistService],
-  // exports: [ArtistService],
-  imports: [TypeOrmModule.forFeature([ArtistEntity])],
+  exports: [ArtistService],
 })
 export class ArtistModule {}

@@ -1,11 +1,17 @@
-import { IsInt, IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 import { AlbumEntity } from 'src/Album/entities/album.entity';
 import { ArtistEntity } from 'src/Artist/entities/artist.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('tracks')
 export class TrackEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   @IsUUID('4')
   id: string;
 
@@ -16,9 +22,11 @@ export class TrackEntity {
 
   @Column({ nullable: true })
   @IsUUID('4')
+  @IsOptional()
   artistId?: string;
 
   @Column({ nullable: true })
+  @IsOptional()
   @IsUUID('4')
   albumId?: string;
 

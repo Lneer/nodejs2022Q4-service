@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ErrorsCode } from '../utils/common types/enum';
 import { ArtistEntity } from './entities/artist.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -23,11 +23,12 @@ export class ArtistService {
   }
 
   async findOne(artistId: string) {
-    const user = await this.artistRepository.findOne({
+    const artist = await this.artistRepository.findOne({
       where: { id: artistId },
     });
-    if (user) return user;
-    throw new Error(ErrorsCode[404]);
+    if (!artist) throw new NotFoundException(ErrorsCode[404]);
+
+    return artist;
   }
 
   async change(artistId: string, chandeDTO: ChangeArtistDTO) {
@@ -36,25 +37,23 @@ export class ArtistService {
     });
 
     if (!artistForUpdate) {
-      throw new Error(ErrorsCode[404]);
+      throw new NotFoundException(ErrorsCode[404]);
     }
 
     const changedEntity = {
       ...artistForUpdate,
       ...chandeDTO,
     };
-
-    const changedArtist = await this.artistRepository.save(changedEntity);
+    const createdEntity = this.artistRepository.create(changedEntity);
+    const changedArtist = await this.artistRepository.save(createdEntity);
     return changedArtist;
   }
 
   async delete(artistId: string) {
-    const deletedArtist = await this.artistRepository.delete(artistId);
-
-    if (deletedArtist.affected === 0) {
-      throw new Error(ErrorsCode[404]);
-    }
-
-    return deletedArtist;
+    const user = await this.artistRepository.findOne({
+      where: { id: artistId },
+    });
+    if (!user) throw new NotFoundException(ErrorsCode[404]);
+    await this.artistRepository.delete(artistId);
   }
 }
