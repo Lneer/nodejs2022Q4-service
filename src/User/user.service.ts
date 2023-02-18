@@ -1,11 +1,13 @@
-import { v4 as uuid } from 'uuid';
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ErrorsCode } from 'src/utils/common types/enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
 import { CreateUserDTO } from './dto/createUser.dto';
-import { UserDto } from './dto/user.dto';
 import { ChangeUserDTO } from './dto/changeUser.dto';
 
 @Injectable()
@@ -18,28 +20,25 @@ export class UserService {
   async create(userDto: CreateUserDTO) {
     const timeStamp = Date.now();
 
-    const created: UserDto = {
+    const created = {
       ...userDto,
-      id: uuid(),
       version: 1,
       createdAt: timeStamp,
       updatedAt: timeStamp,
     };
-    const createdUser = this.userRepository.create(created);
-    return (await this.userRepository.save(createdUser)).toResponse();
+    const createdEntity = this.userRepository.create(created);
+    return (await this.userRepository.save(createdEntity)).toResponse();
   }
 
   async findAll() {
     const users = await this.userRepository.find();
-
     return users.map((user) => user.toResponse());
   }
 
   async findOne(userId: string) {
     const user = await this.userRepository.findOne({ where: { id: userId } });
-
-    if (user) return user.toResponse();
-    throw new Error(ErrorsCode[404]);
+    if (!user) throw new NotFoundException(ErrorsCode[404]);
+    return user.toResponse();
   }
 
   async change(userId: string, chandeDTO: ChangeUserDTO) {
@@ -48,30 +47,30 @@ export class UserService {
     });
 
     if (!userForUpdate) {
-      throw new Error(ErrorsCode[404]);
+      throw new NotFoundException(ErrorsCode[404]);
     }
 
     if (chandeDTO.oldPassword !== userForUpdate.password) {
-      throw new Error(ErrorsCode[403]);
+      throw new ForbiddenException(ErrorsCode[403]);
     }
     const version = userForUpdate.version + 1;
     const updatedAt = Date.now();
-    const changedEntity = {
+    const createdAt = Number(userForUpdate.createdAt);
+    const changed = {
       ...userForUpdate,
       version,
+      createdAt,
       updatedAt,
       password: chandeDTO.newPassword,
     };
-
-    const changedUser = await this.userRepository.save(changedEntity);
-    return changedUser;
+    const createdEntity = this.userRepository.create(changed);
+    const changedUser = await this.userRepository.save(createdEntity);
+    return changedUser.toResponse();
   }
 
   async delete(userId: string) {
-    const deletedUser = await this.userRepository.delete(userId);
-
-    if (deletedUser.affected === 0) {
-      throw new Error(ErrorsCode[404]);
-    }
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) throw new NotFoundException(ErrorsCode[404]);
+    await this.userRepository.delete(userId);
   }
 }

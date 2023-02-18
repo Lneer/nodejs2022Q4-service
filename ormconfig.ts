@@ -13,6 +13,4 @@ export default {
   database: process.env.POSTGRES_DATABASE as string,
   synchronize: true,
   entities: [UserEntity],
-  autoLoadEntities: true,
-  autoLoadModels: true,
 } as DataSourceOptions;

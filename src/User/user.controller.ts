@@ -61,10 +61,9 @@ export class UserController {
     } catch (error) {
       if (error.message === ErrorsCode[404]) {
         throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
-      }
-      if (error.message === ErrorsCode[403]) {
+      } else if (error.message === ErrorsCode[403]) {
         throw new HttpException('incorrect password', HttpStatus.FORBIDDEN);
-      }
+      } else return error.message;
     }
   }
 }

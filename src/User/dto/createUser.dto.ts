@@ -1,7 +1,7 @@
 import { OmitType } from '@nestjs/mapped-types';
-import { UserDto } from './user.dto';
+import { UserEntity } from '../entities/user.entity';
 
-export class CreateUserDTO extends OmitType(UserDto, [
+export class CreateUserDTO extends OmitType(UserEntity, [
   'id',
   'version',
   'updatedAt',

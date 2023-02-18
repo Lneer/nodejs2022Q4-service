@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
 import { ErrorsCode } from 'src/utils/common types/enum';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,12 +14,7 @@ export class AlbumService {
   ) {}
 
   async create(albumDto: CreateAlbumDTO) {
-    const created: AlbumEntity = {
-      ...albumDto,
-      id: uuid(),
-    };
-    const createdAlbum = this.albumRepository.create(created);
-    return await this.albumRepository.save(createdAlbum);
+    return this.albumRepository.save(albumDto);
   }
 
   async findAll() {

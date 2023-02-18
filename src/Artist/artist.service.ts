@@ -1,11 +1,9 @@
-import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
 import { ErrorsCode } from '../utils/common types/enum';
 import { ArtistEntity } from './entities/artist.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateArtistDTO } from './dto/createArtist.dto';
-import { ArtistDto } from './dto/artist.dto';
 import { ChangeArtistDTO } from './dto/chandeArtist.dto';
 
 @Injectable()
@@ -16,14 +14,9 @@ export class ArtistService {
   ) {}
 
   async create(artistDto: CreateArtistDTO) {
-    const created: ArtistDto = {
-      ...artistDto,
-      id: uuid(),
-    };
-
-    const createdArtist = this.artistRepository.create(created);
-    return await this.artistRepository.save(createdArtist);
+    return await this.artistRepository.save(artistDto);
   }
+
   async findAll() {
     const artists = await this.artistRepository.find();
     return artists;
