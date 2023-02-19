@@ -1,4 +1,4 @@
-version: '13'
+version: '3.7'
 
 services:
   main: 
@@ -11,7 +11,7 @@ services:
       - :/app
       - :/app/node_modules
     ports:
-      -5000:5000
+      -'${PORT}:${PORT}'
     command: npm run start
 
     depends_on: 
@@ -28,7 +28,7 @@ services:
         PG_DATA: /var/lib/postgresql/data
 
       ports: 
-        -5432:5432
+         - '${POSTGRES_PORT}:${POSTGRES_PORT}'
       volumes:
         - pgdata: /var/lib/postgresql/data
       restart: always
