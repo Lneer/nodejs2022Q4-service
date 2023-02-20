@@ -1,0 +1,77 @@
+# version: '3.7'
+
+# services:
+#   main: 
+#     container_name: main
+#     build: .
+#     env_file: 
+#      - .env
+#     volumes:
+#       - .:/app
+#       - .:/app/node_modules
+#     ports:
+#       - "${PORT}:${PORT}"
+#     command: npm run start
+
+#     depends_on: 
+#       - postrges
+    
+#     restart: always
+
+#   postrges:
+#       container_name: postgres
+#       image: postgres:13
+#       build: ./DB
+#       env_file:
+#         - .env
+#       environment: 
+#         - POSTGRES_USER=${POSTGRES_USER}
+#         - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+#         - POSTGRES_DB=${POSTGRES_DATABASE}
+#       ports: 
+#          - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+#       volumes:
+#         - pgdata:/var/lib/postgresql/data
+#       restart: always
+
+# volumes:
+#   pgdata:
+version: '3.7'
+services:
+  node:
+    container_name: node-service
+    env_file:
+      - .env
+    build:
+      context: .
+      target: development
+    ports:
+      - '${PORT}:${PORT}'
+    restart: always
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run start:dev
+    depends_on:
+      - postgres
+    networks:
+      - node-postgres-bridge
+  postgres:
+    container_name: postgres-service
+    env_file:
+      - .env
+    build: ./src/utils/DB/
+    ports:
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+    restart: always
+    volumes:
+      - database:/var/lib/postgresql/data
+      - database-logs:/logs
+    networks:
+      - node-postgres-bridge
+volumes:
+  database:
+  database-logs:
+networks:
+  node-postgres-bridge:
+    driver: bridge

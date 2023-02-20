@@ -47,8 +47,10 @@ export class FavoriteService {
 
     return emptyFavourites;
   }
-  async addTrack(id: string) {
-    const track = await this.tracksRepository.findOneBy({ id });
+  async addTrack(trackId: string) {
+    const track = await this.tracksRepository.findOne({
+      where: { id: trackId },
+    });
 
     if (!track) {
       throw new HttpException(
@@ -72,8 +74,10 @@ export class FavoriteService {
     await this.favouriteRepository.save(favourite);
   }
 
-  async addAlbum(id: string) {
-    const album = await this.albumsRepository.findOneBy({ id });
+  async addAlbum(albumId: string) {
+    const album = await this.albumsRepository.findOne({
+      where: { id: albumId },
+    });
 
     if (!album) {
       throw new HttpException(
@@ -97,8 +101,10 @@ export class FavoriteService {
     await this.favouriteRepository.save(favourite);
   }
 
-  async addArtist(id: string) {
-    const artist = await this.artistsRepository.findOneBy({ id });
+  async addArtist(artistId: string) {
+    const artist = await this.artistsRepository.findOne({
+      where: { id: artistId },
+    });
 
     if (!artist) {
       throw new HttpException(
